@@ -6,9 +6,9 @@ import static org.junit.Assert.*;
 
 
 public abstract class AbstractUndirectedGraphTest {
-	public abstract IUndirectedGraph<Character> get();
+	public abstract IGraph<Character> get();
 	
-	IUndirectedGraph<Character> g;
+	IGraph<Character> g;
 	
 	@Before
 	public void setUp() {

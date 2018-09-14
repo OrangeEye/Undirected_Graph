@@ -3,9 +3,9 @@ package main;
 public class TestUndirectedGraph extends AbstractUndirectedGraphTest {
 
 	@Override
-	public IUndirectedGraph<Character> get() {
+	public IGraph<Character> get() {
 		// TODO Auto-generated method stub
-		return new UndirectedGraph<Character>();
+		return new Graph<Character>();
 	}
 
 }
