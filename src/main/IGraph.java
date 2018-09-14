@@ -4,7 +4,9 @@ import java.util.List;
 
 public interface IGraph<T> {
 	void addNode( T value );
-	void addEdge( int node1Index, int node2Index );
+	void addEdge( T value1, T value2, double edge );
+	
+	void remove(T value);
 	
 	List<T> bfs( int startIndex );
 	List<T> dfs( int startIndex );
@@ -12,4 +14,9 @@ public interface IGraph<T> {
 	boolean isConnected();
 	boolean hasCycles();
 	boolean isTree();
+	
+
+	double getDistance(T value1, T value2);
+	
+
 }

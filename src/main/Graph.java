@@ -9,7 +9,7 @@ public abstract class Graph<T> implements IGraph<T> {
 	protected ArrayList<Node<T>> nodes = new ArrayList<Node<T>>();
 	protected ArrayList<Node<T>> dfs = new ArrayList<Node<T>>();
 	protected ArrayList<Node<T>> bfs = new ArrayList<Node<T>>();
-	protected Deque<Node<T>> tempBfs = new ArrayDeque<Node<T>>();
+	protected Deque<Node<T>> tempBfs = new ArrayDeque<Node<T>>(); 
 
 	@Override
 	public void addNode(T value) {
@@ -33,7 +33,7 @@ public abstract class Graph<T> implements IGraph<T> {
 	private void breadthFirstR(Node<T> node) {
 		//bfs.add(node);
 		//tempBfs.add(node);
-		for (Node<T> connection : node.getConnections())
+		for (Node<T> connection : node.getNeighborNodes().keySet())
 			if (!bfs.contains(connection) && !tempBfs.contains(connection)) {
 				tempBfs.addLast(connection);
 			}
@@ -69,7 +69,7 @@ public abstract class Graph<T> implements IGraph<T> {
 	private void deepFirstSearch(Node<T> node) {
 
 		dfs.add(node);
-		for (Node<T> connection : node.getConnections()) {
+		for (Node<T> connection : node.getNeighborNodes().keySet()) {
 			if (!dfs.contains(connection))
 				deepFirstSearch(connection);
 		}
