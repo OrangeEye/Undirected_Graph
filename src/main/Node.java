@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class Node<T> {
@@ -8,6 +11,8 @@ public class Node<T> {
 	// Speichert die Verbindung zwischen den Knoten mit dem entsprechenden Weg
 	private HashMap<Node<T>, Double> neighborNodes = new HashMap<Node<T>, Double>();
 	private HashMap<Node<T>, Double> distances = new HashMap<Node<T>, Double>();
+
+	private ArrayList<T> connections = new ArrayList<T>();
 
 	// Variable ob die Verbindungen zu den Knoten neu berechnet werden muss
 	private boolean outdated = true;
@@ -36,6 +41,11 @@ public class Node<T> {
 		node.addConnectionR(this, edge);
 	}
 
+	protected ArrayList<T> getConnections() {
+		checkOutdated();
+		return this.connections;
+	}
+
 	private void addConnectionR(Node<T> node, Double edge) {
 		if (node == null)
 			return;
@@ -61,10 +71,7 @@ public class Node<T> {
 		if (node == null)
 			return 0;
 
-		if(outdated) {
-			this.setOutdated(false);
-			updateEdges();
-		}
+		checkOutdated();
 		try {
 			if (!distances.containsKey(node))
 				throw new RuntimeException("Node ist nicht in connections enthalten");
@@ -75,7 +82,33 @@ public class Node<T> {
 
 	}
 
-	private void updateEdges() {
+	private void updateConnections() {
+		this.connections.clear();
+
+		/**
+		 * Sucht die nähesten Knoten und fügt Sie sortiert in die Liste ein
+		 */
+		for (int i = 0; i < distances.keySet().size(); i++) {
+			Node<T> shortestNode = null;
+			Double shortestDistance = Double.MAX_VALUE;
+			for (Node<T> node2 : distances.keySet()) {
+				if (connections.contains(node2.value))
+					continue;
+				if (shortestNode == null || this.getDistance(node2) < shortestDistance) {
+					shortestNode = node2;
+					shortestDistance = this.getDistance(node2);
+				}
+
+			}
+			connections.add(shortestNode.getValue());
+		}
+
+	}
+
+	/**
+	 * aktualisiert distances
+	 */
+	private void updateDistances() {
 
 		HashMap<Node<T>, Double> visited = new HashMap<Node<T>, Double>();
 		this.distances.clear();
@@ -93,12 +126,11 @@ public class Node<T> {
 
 		// Springt in den kürzesten Knoten und macht da weiter
 		visited.put(shortestNeighbor, shortestDistance);
-		updateEdgesR(this, shortestNeighbor, visited, shortestDistance);
-
+		updateDistancesR(this, shortestNeighbor, visited, shortestDistance);
 
 	}
 
-	private void updateEdgesR(Node<T> origin, Node<T> currentNode, HashMap<Node<T>, Double> visited,
+	private void updateDistancesR(Node<T> origin, Node<T> currentNode, HashMap<Node<T>, Double> visited,
 			double distanceToCurrent) {
 
 		/**
@@ -106,7 +138,7 @@ public class Node<T> {
 		 * Knoten, wenn die Knoten noch nicht betrachtet wurden oder der Weg kürzer ist
 		 */
 		for (Node<T> neighbor : currentNode.neighborNodes.keySet()) {
-			if(neighbor.equals(origin))
+			if (neighbor.equals(origin))
 				continue;
 			double distance = currentNode.getEdgeValue(neighbor) + distanceToCurrent;
 			if (!origin.distances.containsKey(neighbor))
@@ -122,7 +154,8 @@ public class Node<T> {
 		Node<T> shortestUnvisited = null;
 		double shortestUnvisitedDistance = Double.MAX_VALUE;
 		for (Node<T> unvisitedNode : origin.distances.keySet()) {
-			if (!visited.containsKey(unvisitedNode) && (shortestUnvisited == null  || origin.getDistance(unvisitedNode) < shortestUnvisitedDistance)) {
+			if (!visited.containsKey(unvisitedNode)
+					&& (shortestUnvisited == null || origin.getDistance(unvisitedNode) < shortestUnvisitedDistance)) {
 				shortestUnvisited = unvisitedNode;
 				shortestUnvisitedDistance = origin.getDistance(unvisitedNode);
 			}
@@ -130,7 +163,7 @@ public class Node<T> {
 
 		if (shortestUnvisited != null) {
 			visited.put(shortestUnvisited, shortestUnvisitedDistance);
-			updateEdgesR(origin, shortestUnvisited, visited, shortestUnvisitedDistance);
+			updateDistancesR(origin, shortestUnvisited, visited, shortestUnvisitedDistance);
 		}
 
 	}
@@ -138,14 +171,22 @@ public class Node<T> {
 	protected void setOutdated(boolean outdated) {
 		this.outdated = outdated;
 	}
-	
+
+	private void checkOutdated() {
+		if (outdated) {
+			this.setOutdated(false);
+			updateDistances();
+			updateConnections();
+		}
+	}
+
 	@Override
 	public String toString() {
 		return this.value.toString();
 	}
-	
+
 	protected void removeConnection(Node<T> toRemove) {
-		this.outdated=true;
+		this.outdated = true;
 		neighborNodes.remove(toRemove);
 
 	}

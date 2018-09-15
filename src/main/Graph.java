@@ -14,6 +14,7 @@ public class Graph<T> implements IGraph<T> {
 	@Override
 	public void addNode(T value) {
 		nodes.add(new Node<T>(value));
+		setOutdated();
 	}
 
 	@Override
@@ -89,10 +90,14 @@ public class Graph<T> implements IGraph<T> {
 		}
 		
 		getNode(value1).addConnection(getNode(value2), edge);
+		setOutdated();
+
+	}
+	
+	private void setOutdated() {
 		for(Node<T> node : nodes) {
 			node.setOutdated(true);
 		}
-
 	}
 
 	@Override
@@ -169,6 +174,9 @@ public class Graph<T> implements IGraph<T> {
 		return null;
 	}
 
+	/**
+	 * entfernt einen Knoten aus dem Graphen
+	 */
 	@Override
 	public void remove(T value) {
 		Node<T> toRemove = getNode(value);
@@ -177,6 +185,10 @@ public class Graph<T> implements IGraph<T> {
 			node.removeConnection(toRemove);
 		}
 	}
+	
+	/**
+	 * Gibt die kürzeste Entfernung zwischen zwei Knoten zurück.
+	 */
 
 	@Override
 	public double getDistance(T value1, T value2) {
@@ -184,6 +196,15 @@ public class Graph<T> implements IGraph<T> {
 			return -1;
 		
 		return getNode(value1).getDistance((getNode(value2)));
+	}
+	
+	/**
+	 * Gibt die Verbindungen des Knoten in sortierter, aufsteigender Reinfolge zurück.
+	 */
+
+	@Override
+	public ArrayList<T> getConnections(T value) { 
+		return this.getNode(value).getConnections();
 	}
 
 }

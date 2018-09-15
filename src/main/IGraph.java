@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IGraph<T> {
@@ -17,6 +18,6 @@ public interface IGraph<T> {
 	
 
 	double getDistance(T value1, T value2);
-	
+	ArrayList<T> getConnections(T value);
 
 }
